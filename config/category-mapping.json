@@ -1,0 +1,174 @@
+{
+  "version": "1.0",
+  "description": "Mapare categorii feed-uri (Profitshare, 2Performant, Amazon) către taxonomia Amdoro",
+  
+  "categoryMapping": {
+    "electronice-it": {
+      "amdoroId": "cat-001",
+      "name": "Electronice & IT",
+      "slug": "electronice-it",
+      "feedMappings": {
+        "profitshare": ["IT & C", "Electronics", "Computers", "Telefoane & Tablete"],
+        "2performant": ["IT&C", "Electronice", "Gadgets"],
+        "amazon": ["Electronics", "Computers & Accessories", "Cell Phones & Accessories"]
+      },
+      "subcategories": {
+        "laptopuri-calculatoare": {
+          "amdoroId": "cat-001-01",
+          "name": "Laptopuri & Calculatoare",
+          "slug": "laptopuri-calculatoare",
+          "feedMappings": {
+            "profitshare": ["Laptopuri", "Desktop", "Componente PC"],
+            "2performant": ["Laptopuri", "PC-uri", "Hardware"],
+            "amazon": ["Laptops", "Desktops", "Computer Components"]
+          }
+        },
+        "telefoane-tablete": {
+          "amdoroId": "cat-001-02",
+          "name": "Telefoane & Tablete",
+          "slug": "telefoane-tablete",
+          "feedMappings": {
+            "profitshare": ["Telefoane Mobile", "Tablete"],
+            "2performant": ["Telefoane", "Smartphone", "Tablete"],
+            "amazon": ["Cell Phones", "Tablets", "E-Readers"]
+          }
+        }
+      }
+    },
+    
+    "moda-imbracaminte": {
+      "amdoroId": "cat-002",
+      "name": "Moda & Îmbrăcăminte",
+      "slug": "moda-imbracaminte",
+      "feedMappings": {
+        "profitshare": ["Fashion", "Îmbrăcăminte", "Haine"],
+        "2performant": ["Modă", "Fashion", "Îmbrăcăminte"],
+        "amazon": ["Clothing, Shoes & Jewelry", "Fashion"]
+      },
+      "subcategories": {
+        "femei": {
+          "amdoroId": "cat-002-01",
+          "name": "Moda Femei",
+          "slug": "femei",
+          "feedMappings": {
+            "profitshare": ["Femei", "Women", "Dame"],
+            "2performant": ["Îmbrăcăminte Femei", "Fashion Femei"],
+            "amazon": ["Women's Clothing", "Women's Shoes"]
+          }
+        },
+        "barbati": {
+          "amdoroId": "cat-002-02",
+          "name": "Moda Bărbați",
+          "slug": "barbati",
+          "feedMappings": {
+            "profitshare": ["Bărbați", "Men", "Barbati"],
+            "2performant": ["Îmbrăcăminte Bărbați", "Fashion Bărbați"],
+            "amazon": ["Men's Clothing", "Men's Shoes"]
+          }
+        }
+      }
+    },
+    
+    "casa-gradina": {
+      "amdoroId": "cat-003",
+      "name": "Casa & Grădina",
+      "slug": "casa-gradina",
+      "feedMappings": {
+        "profitshare": ["Casă și Grădină", "Home & Living", "Decorațiuni"],
+        "2performant": ["Casa", "Gradina", "Home"],
+        "amazon": ["Home & Kitchen", "Patio, Lawn & Garden"]
+      }
+    },
+    
+    "electrocasnice": {
+      "amdoroId": "cat-004",
+      "name": "Electrocasnice",
+      "slug": "electrocasnice",
+      "feedMappings": {
+        "profitshare": ["Electrocasnice", "Aparate Electrice"],
+        "2performant": ["Electrocasnice Mari", "Electrocasnice Mici"],
+        "amazon": ["Appliances", "Kitchen & Dining"]
+      }
+    },
+    
+    "sport-fitness": {
+      "amdoroId": "cat-005",
+      "name": "Sport & Fitness",
+      "slug": "sport-fitness",
+      "feedMappings": {
+        "profitshare": ["Sport", "Fitness", "Outdoor"],
+        "2performant": ["Sport & Timp Liber", "Fitness"],
+        "amazon": ["Sports & Outdoors", "Exercise & Fitness"]
+      }
+    },
+    
+    "frumusete-sanatate": {
+      "amdoroId": "cat-006",
+      "name": "Frumusețe & Sănătate",
+      "slug": "frumusete-sanatate",
+      "feedMappings": {
+        "profitshare": ["Beauty", "Cosmetice", "Sănătate"],
+        "2performant": ["Frumusete", "Ingrijire", "Health & Beauty"],
+        "amazon": ["Beauty & Personal Care", "Health & Household"]
+      }
+    },
+    
+    "jucarii-copii": {
+      "amdoroId": "cat-007",
+      "name": "Jucării & Copii",
+      "slug": "jucarii-copii",
+      "feedMappings": {
+        "profitshare": ["Jucării", "Copii & Bebeluși", "Kids"],
+        "2performant": ["Jucarii", "Copii", "Baby"],
+        "amazon": ["Toys & Games", "Baby Products"]
+      }
+    },
+    
+    "carti-media": {
+      "amdoroId": "cat-008",
+      "name": "Cărți & Media",
+      "slug": "carti-media",
+      "feedMappings": {
+        "profitshare": ["Cărți", "Books", "Media"],
+        "2performant": ["Carti", "Literatura", "Ebooks"],
+        "amazon": ["Books", "Kindle Store", "Audible Books & Originals"]
+      }
+    },
+    
+    "auto-moto": {
+      "amdoroId": "cat-009",
+      "name": "Auto & Moto",
+      "slug": "auto-moto",
+      "feedMappings": {
+        "profitshare": ["Auto", "Automotive", "Moto"],
+        "2performant": ["Auto-Moto", "Piese Auto"],
+        "amazon": ["Automotive", "Motorcycle & Powersports"]
+      }
+    },
+    
+    "pet-shop": {
+      "amdoroId": "cat-010",
+      "name": "Pet Shop",
+      "slug": "pet-shop",
+      "feedMappings": {
+        "profitshare": ["Pet Shop", "Animale", "Pets"],
+        "2performant": ["Animale de Companie", "Pet"],
+        "amazon": ["Pet Supplies"]
+      }
+    }
+  },
+  
+  "mappingRules": {
+    "priority": "Ordine verificare: 1) Match exact subcategorie, 2) Match parțial cu keywords, 3) Fallback la categorie părinte, 4) Default 'Diverse'",
+    "fuzzyMatching": true,
+    "caseInsensitive": true,
+    "removeAccents": true,
+    "keywords": {
+      "laptop": "cat-001-01",
+      "telefon|smartphone|mobile": "cat-001-02",
+      "rochie|pantalon|bluza": "cat-002",
+      "frigider|masina de spalat": "cat-004",
+      "caine|pisica|animal": "cat-010"
+    }
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "version": "1.0",
+  "description": "Template-uri pentru generare automată SEO - Titluri, Meta Descriptions, H1",
+  
+  "productPageTemplates": {
+    "h1Title": {
+      "templates": [
+        {
+          "pattern": "{{brand}} {{model}} - {{keyAttribute}} | {{price}}",
+          "example": "Apple MacBook Pro 14 - M3 Pro, 16GB RAM | 8.999 RON",
+          "useCase": "Produse tech cu model specific",
+          "priority": 1
+        },
+        {
+          "pattern": "{{productType}} {{brand}} {{model}} {{color}} - {{size}}",
+          "example": "Rochie Zara Summer Collection Roșie - Mărimea M",
+          "useCase": "Fashion & Îmbrăcăminte",
+          "priority": 2
+        },
+        {
+          "pattern": "{{brand}} {{productType}} - {{capacity}} | {{energyClass}}",
+          "example": "Samsung Frigider Side-by-Side - 617L | Clasa A++",
+          "useCase": "Electrocasnice",
+          "priority": 3
+        },
+        {
+          "pattern": "{{productName}} - {{mainBenefit}}",
+          "example": "Aspirator Roomba i7+ - Golire Automată 60 Zile",
+          "useCase": "Produse cu beneficii unice",
+          "priority": 4
+        }
+      ],
+      "variables": {
+        "brand": "Din câmp products.brand",
+        "model": "Din câmp products.model SAU extras din title",
+        "keyAttribute": "Prima specificație importantă (RAM, Procesor, etc.)",
+        "price": "Formatat: X.XXX RON",
+        "productType": "Categorie granulară (Laptop, Rochie, Frigider)",
+        "color": "Din specifications.Culoare",
+        "size": "Din specifications.Marime",
+        "capacity": "Din specifications.Capacitate",
+        "energyClass": "Din specifications.ClasaEnergetica",
+        "mainBenefit": "USP extras din description"
+      },
+      "maxLength": 200,
+      "fallback": "{{title}} | Amdoro.ro"
+    },
+    
+    "metaTitle": {
+      "templates": [
+        {
+          "pattern": "{{brand}} {{model}} {{keyAttribute}} - Preț {{price}} | Amdoro",
+          "example": "Apple iPhone 15 Pro 256GB - Preț 5.499 RON | Amdoro",
+          "length": "50-60 caractere",
+          "priority": 1
+        },
+        {
+          "pattern": "{{productName}} - {{discount}}% Reducere | Amdoro.ro",
+          "example": "Laptop Dell Inspiron 15 - 25% Reducere | Amdoro.ro",
+          "useCase": "Produse cu discount > 15%",
+          "priority": 2
+        },
+        {
+          "pattern": "{{brand}} {{model}} | {{categoryName}} | Amdoro",
+          "example": "Samsung Galaxy S24 | Telefoane | Amdoro",
+          "useCase": "Fallback generic",
+          "priority": 3
+        }
+      ],
+      "maxLength": 60,
+      "keywords": "Include brand + model în primele 40 caractere",
+      "branding": "Termină întotdeauna cu | Amdoro sau | Amdoro.ro"
+    },
+    
+    "metaDescription": {
+      "templates": [
+        {
+          "pattern": "{{brand}} {{model}} la doar {{price}} pe Amdoro.ro. {{keySpecs}}. {{cta}} {{deliveryInfo}} {{discount}}",
+          "example": "Apple MacBook Pro 14 la doar 8.999 RON pe Amdoro.ro. Procesor M3 Pro, 16GB RAM, 512GB SSD. Comandă acum și beneficiezi de livrare gratuită! Cashback 3%.",
+          "length": "140-160 caractere",
+          "priority": 1
+        },
+        {
+          "pattern": "Cumpără {{productName}} de la {{merchant}} prin Amdoro. {{mainBenefit}}. {{priceInfo}} {{warranty}}",
+          "example": "Cumpără Frigider Samsung Side by Side de la eMAG prin Amdoro. Capacitate 617L, Clasa A++. Preț: 3.299 RON. Garanție 3 ani.",
+          "useCase": "Electrocasnice & produse cu garanție",
+          "priority": 2
+        },
+        {
+          "pattern": "{{productType}} {{brand}} - {{uniqueFeature}}. Preț {{price}}. {{stockStatus}} {{deliveryTime}}",
+          "example": "Laptop Gaming ASUS ROG - RTX 4070, ecran 165Hz. Preț 6.499 RON. În stoc - Livrare în 24h.",
+          "useCase": "Gaming & tech",
+          "priority": 3
+        }
+      ],
+      "variables": {
+        "keySpecs": "Top 3 specificații concatenate",
+        "cta": "Rotate între: 'Comandă acum', 'Cumpără online', 'Verifică oferta'",
+        "deliveryInfo": "Livrare gratuită peste X RON SAU Livrare rapidă",
+        "discount": "Include doar dacă > 10%",
+        "merchant": "Magazin partener (eMAG, Altex, etc.)",
+        "mainBenefit": "Beneficiu principal extras din description",
+        "priceInfo": "Include old_price dacă există: 'Redus de la X RON'",
+        "warranty": "Dacă există în specs",
+        "stockStatus": "În stoc / Stoc limitat / Precomandă",
+        "deliveryTime": "24h / 48h / 3-5 zile",
+        "uniqueFeature": "Feature diferențiator față de competiție"
+      },
+      "maxLength": 160,
+      "minLength": 140,
+      "keywords": "Include brand + categorie + preț"
+    }
+  },
+  
+  "categoryPageTemplates": {
+    "h1Title": {
+      "templates": [
+        {
+          "pattern": "{{categoryName}} - {{productsCount}} Produse | Cele Mai Bune Oferte",
+          "example": "Laptopuri & Calculatoare - 2.547 Produse | Cele Mai Bune Oferte"
+        },
+        {
+          "pattern": "{{categoryName}} Online | Prețuri de la {{minPrice}} RON",
+          "example": "Telefoane Online | Prețuri de la 299 RON"
+        }
+      ]
+    },
+    
+    "metaTitle": {
+      "templates": [
+        {
+          "pattern": "{{categoryName}} - {{productsCount}}+ Produse | Amdoro.ro 2026",
+          "example": "Laptopuri - 2.547+ Produse | Amdoro.ro 2026"
+        },
+        {
+          "pattern": "Cumpără {{categoryName}} Online | Oferte Amdoro",
+          "example": "Cumpără Telefoane Online | Oferte Amdoro"
+        }
+      ]
+    },
+    
+    "metaDescription": {
+      "templates": [
+        {
+          "pattern": "Descoperă {{productsCount}}+ {{categoryName}} pe Amdoro.ro. {{topBrands}}. Prețuri de la {{minPrice}} RON. {{deliveryInfo}} {{paymentInfo}}",
+          "example": "Descoperă 2.547+ Laptopuri pe Amdoro.ro. Apple, Dell, ASUS, Lenovo, HP. Prețuri de la 1.299 RON. Livrare gratuită. Plată în rate."
+        }
+      ]
+    }
+  },
+  
+  "brandLandingPageTemplates": {
+    "h1Title": {
+      "pattern": "Produse {{brand}} - {{categoryName}} | Amdoro.ro",
+      "example": "Produse Apple - Laptopuri & Calculatoare | Amdoro.ro"
+    },
+    
+    "metaTitle": {
+      "pattern": "{{brand}} {{categoryName}} - Oferte & Prețuri | Amdoro 2026",
+      "example": "Apple Laptopuri - Oferte & Prețuri | Amdoro 2026"
+    },
+    
+    "metaDescription": {
+      "pattern": "{{productsCount}} produse {{brand}} în categoria {{categoryName}}. {{priceRange}}. Garanție oficială. {{deliveryInfo}} Compară prețuri de la {{merchantsCount}} magazine.",
+      "example": "127 produse Apple în categoria Laptopuri. Prețuri între 4.999 - 18.999 RON. Garanție oficială. Livrare rapidă. Compară prețuri de la 8 magazine."
+    }
+  },
+  
+  "contentEnrichment": {
+    "description": "Strategii pentru evitarea conținutului duplicat 100%",
+    
+    "methods": [
+      {
+        "name": "Sentence Reordering",
+        "description": "Reordonează propoziții din descrierea originală",
+        "example": {
+          "original": "Laptop cu procesor Intel Core i7. Are 16GB RAM. Stocare 512GB SSD.",
+          "enriched": "Cu o capacitate de stocare de 512GB SSD și 16GB RAM, acest laptop echipat cu procesor Intel Core i7 oferă performanțe excelente."
+        }
+      },
+      {
+        "name": "Synonym Replacement",
+        "description": "Înlocuiește cuvinte cheie cu sinonime",
+        "synonyms": {
+          "laptop": ["notebook", "computer portabil", "laptop ultraportabil"],
+          "telefon": ["smartphone", "telefon mobil", "device mobil"],
+          "redus": ["discount", "reducere", "ofertă specială", "preț promotional"],
+          "livrare": ["transport", "expediere", "livrare curier"],
+          "garantie": ["garanție oficială", "asigurare produc", "protecție extinsă"]
+        }
+      },
+      {
+        "name": "Technical Specs Expansion",
+        "description": "Adaugă context explicativ la specificații",
+        "example": {
+          "original": "16GB RAM",
+          "enriched": "16GB memorie RAM DDR5 pentru multitasking fluid și aplicații demanding"
+        }
+      },
+      {
+        "name": "Benefit-Driven Content",
+        "description": "Transformă specificații în beneficii",
+        "transformations": [
+          {"spec": "Procesor Intel Core i7", "benefit": "Performanțe rapide pentru gaming și editare video"},
+          {"spec": "Baterie 5000mAh", "benefit": "Autonomie de până la 2 zile cu o singură încărcare"},
+          {"spec": "Cameră 108MP", "benefit": "Fotografii ultra-detaliate chiar și în condiții de lumină scăzută"}
+        ]
+      },
+      {
+        "name": "Contextual Information",
+        "description": "Adaugă informații contextuale relevante",
+        "additions": [
+          "Comparație cu modele similare",
+          "Cazuri de utilizare (gaming, business, foto/video)",
+          "Compatibilitate cu alte produse/accesorii",
+          "Review summary (dacă există date)",
+          "Informații despre producător/brand"
+        ]
+      }
+    ],
+    
+    "automationRules": {
+      "minOriginalWords": 50,
+      "targetEnrichment": "150-300 cuvinte pentru descriere scurtă",
+      "uniquenessThreshold": "Minimum 70% conținut unic față de feed original",
+      "aiAssistance": "Folosește OpenAI API sau Claude pentru generare automată cu prompt templates",
+      "humanReview": "Review manual pentru produse cu indexation_priority >= 8"
+    }
+  },
+  
+  "dynamicVariables": {
+    "global": {
+      "currentYear": "2026",
+      "siteName": "Amdoro.ro",
+      "brandName": "Amdoro",
+      "deliveryDefault": "Livrare gratuită peste 200 RON",
+      "paymentMethods": "Card, ramburs, rate",
+      "supportInfo": "Suport clienți 24/7"
+    },
+    
+    "categorySpecific": {
+      "laptopuri": {
+        "keywordVariations": ["laptopuri", "notebook-uri", "calculatoare portabile"],
+        "commonFilters": ["procesor", "RAM", "stocare", "diagonala"],
+        "topBrands": ["Apple", "Dell", "ASUS", "Lenovo", "HP", "Acer"]
+      },
+      "telefoane": {
+        "keywordVariations": ["telefoane", "smartphone-uri", "telefoane mobile"],
+        "commonFilters": ["brand", "sistem operare", "RAM", "cameră"],
+        "topBrands": ["Apple", "Samsung", "Xiaomi", "Huawei", "OnePlus"]
+      }
+    }
+  },
+  
+  "qualityChecks": {
+    "automated": [
+      "Length validation (min/max caractere)",
+      "Keyword density check (evită keyword stuffing)",
+      "Duplicate detection (compară cu alte produse)",
+      "Brand name spelling consistency",
+      "Price format validation",
+      "Special characters escaping"
+    ],
+    "manual": [
+      "Human review pentru top 1000 produse (indexation_priority >= 8)",
+      "A/B testing pentru template variations",
+      "CTR monitoring în Google Search Console",
+      "Ajustări pe bază de performanță"
+    ]
+  }
+}

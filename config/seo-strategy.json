@@ -1,0 +1,291 @@
+{
+  "version": "1.0",
+  "description": "Strategie SEO și Indexare pentru 300.000 produse - Amdoro.ro",
+  
+  "sitemapStrategy": {
+    "structure": {
+      "sitemapIndex": "https://amdoro.ro/sitemap.xml",
+      "children": [
+        {
+          "name": "sitemap-pages.xml",
+          "type": "static",
+          "priority": 1.0,
+          "changefreq": "monthly",
+          "urls": ["homepage", "despre", "contact", "blog"]
+        },
+        {
+          "name": "sitemap-categories.xml",
+          "type": "categories",
+          "priority": 0.9,
+          "changefreq": "weekly",
+          "count": "~50 URLs"
+        },
+        {
+          "name": "sitemap-brands-top.xml",
+          "type": "brand-landing-pages",
+          "priority": 0.8,
+          "changefreq": "weekly",
+          "count": "~200 URLs (20 brands x 10 categories)"
+        },
+        {
+          "name": "sitemap-products-tier1.xml",
+          "type": "products-high-priority",
+          "priority": 0.8,
+          "changefreq": "daily",
+          "count": "~10.000 URLs",
+          "criteria": "indexation_priority >= 8 OR (views_count > 100 AND conversions_count > 5)"
+        },
+        {
+          "name": "sitemap-products-tier2.xml",
+          "type": "products-medium-priority",
+          "priority": 0.6,
+          "changefreq": "weekly",
+          "count": "~40.000 URLs",
+          "criteria": "indexation_priority >= 5 AND indexation_priority < 8"
+        },
+        {
+          "name": "sitemap-products-tier3-*.xml",
+          "type": "products-low-priority",
+          "priority": 0.4,
+          "changefreq": "monthly",
+          "count": "~250.000 URLs (split în 10 fișiere)",
+          "criteria": "indexation_priority < 5",
+          "splitSize": 25000
+        }
+      ],
+      "maxUrlsPerFile": 50000,
+      "compression": "gzip recommended for large files"
+    },
+    
+    "prioritizationAlgorithm": {
+      "description": "Calculează indexation_priority (1-10) pentru fiecare produs",
+      "formula": "weighted_sum(performance_score, seo_potential, commercial_value)",
+      "factors": [
+        {
+          "name": "performance_score",
+          "weight": 0.4,
+          "calculation": "(views_count * 0.3) + (clicks_count * 0.5) + (conversions_count * 0.2)",
+          "normalization": "Min-Max scaling 0-10"
+        },
+        {
+          "name": "seo_potential",
+          "weight": 0.3,
+          "factors": [
+            {"factor": "search_volume", "weight": 0.5, "source": "Google Keyword Planner API"},
+            {"factor": "competition", "weight": 0.3, "inverse": true},
+            {"factor": "brand_authority", "weight": 0.2}
+          ]
+        },
+        {
+          "name": "commercial_value",
+          "weight": 0.3,
+          "calculation": "(price_cents * commission_percent) + urgency_boost",
+          "urgency_boost": "Produse cu discount mare > 30% primesc +2 puncte"
+        }
+      ],
+      "recalculation": "Rulează zilnic prin cron job la ora 02:00 AM"
+    },
+    
+    "updateFrequency": {
+      "tier1": "Regenerare zilnică",
+      "tier2": "Regenerare săptămânală (Luni dimineața)",
+      "tier3": "Regenerare lunară (prima zi a lunii)",
+      "categories": "La fiecare modificare + săptămânal",
+      "brands": "Săptămânal"
+    }
+  },
+  
+  "robotsTxtConfiguration": {
+    "content": [
+      "# Amdoro.ro - Robots.txt Configuration",
+      "User-agent: *",
+      "Allow: /",
+      "",
+      "# Permit crawling produse",
+      "Allow: /electronice-it/",
+      "Allow: /moda-imbracaminte/",
+      "Allow: /casa-gradina/",
+      "Allow: /p/",
+      "",
+      "# Blochează filtrări complexe (anti-duplicate)",
+      "Disallow: /*?*&*  # Blochează URL-uri cu 2+ parametri",
+      "Disallow: /*?pret=",
+      "Disallow: /*?sort=",
+      "Disallow: /*?page=",
+      "Disallow: /*?stoc=",
+      "",
+      "# Permite branduri importante",
+      "Allow: /*?brand=apple*",
+      "Allow: /*?brand=samsung*",
+      "Allow: /*?brand=dell*",
+      "",
+      "# Blochează pagini tehnice",
+      "Disallow: /api/",
+      "Disallow: /admin/",
+      "Disallow: /_next/",
+      "Disallow: /wp-admin/",
+      "",
+      "# Blochează parametri de tracking",
+      "Disallow: /*?utm_*",
+      "Disallow: /*?ref=*",
+      "Disallow: /*?fbclid=*",
+      "",
+      "# Sitemaps",
+      "Sitemap: https://amdoro.ro/sitemap.xml",
+      "Sitemap: https://amdoro.ro/sitemap-products-tier1.xml",
+      "",
+      "# Crawl rate pentru Googlebot",
+      "User-agent: Googlebot",
+      "Crawl-delay: 1"
+    ]
+  },
+  
+  "indexationRules": {
+    "autoIndex": {
+      "description": "Adaugă automat în sitemap produsele care îndeplinesc criterii",
+      "conditions": [
+        {
+          "rule": "new_product_with_high_commission",
+          "criteria": "age < 7 days AND commission_percent > 10%",
+          "priority": 8
+        },
+        {
+          "rule": "trending_product",
+          "criteria": "views_count increased > 50% in last 7 days",
+          "priority": 9
+        },
+        {
+          "rule": "high_converter",
+          "criteria": "conversions_count > 10 in last 30 days",
+          "priority": 10
+        },
+        {
+          "rule": "top_brand_product",
+          "criteria": "brand IN (SELECT name FROM brands ORDER BY products_count DESC LIMIT 20)",
+          "priority": 7
+        }
+      ]
+    },
+    
+    "autoDeindex": {
+      "description": "Șterge din sitemap produsele care nu mai sunt relevante",
+      "conditions": [
+        {
+          "rule": "out_of_stock_long_term",
+          "criteria": "in_stock = false AND feed_last_seen < NOW() - INTERVAL '30 days'",
+          "action": "remove_from_sitemap"
+        },
+        {
+          "rule": "zero_engagement",
+          "criteria": "views_count = 0 AND age > 90 days",
+          "action": "deprioritize",
+          "newPriority": 1
+        },
+        {
+          "rule": "discontinued_product",
+          "criteria": "status = 'discontinued'",
+          "action": "remove_from_sitemap"
+        }
+      ]
+    }
+  },
+  
+  "internalLinkingStrategy": {
+    "productPages": {
+      "relatedProducts": {
+        "count": 6,
+        "logic": "Aceeași categorie + brand similar + price range ±20%",
+        "linkText": "Contextualizat cu atribute (ex: 'Laptop similar cu mai mult RAM')"
+      },
+      "breadcrumbs": {
+        "structure": "Home > Categorie Principală > Subcategorie > Brand > Produs",
+        "schemaOrg": true
+      },
+      "categoryLinks": {
+        "placement": "Footer produs",
+        "text": "Vezi toate produsele din {subcategorie}",
+        "count": 1
+      }
+    },
+    
+    "categoryPages": {
+      "featuredProducts": {
+        "count": 12,
+        "criteria": "indexation_priority DESC",
+        "linkText": "Include keywords în anchor text"
+      },
+      "subcategoriesGrid": {
+        "display": "Card-uri cu imagine + count produse",
+        "internal_links": "Link către fiecare subcategorie"
+      }
+    },
+    
+    "hubPages": {
+      "description": "Creează pagini hub pentru termeni high-volume",
+      "examples": [
+        "/laptopuri-gaming",
+        "/telefoane-ieftine",
+        "/electrocasnice-clasa-a"
+      ],
+      "content": "500-1000 cuvinte + link către 20-30 produse relevante",
+      "updateFrequency": "Lunar"
+    }
+  },
+  
+  "technicalSEO": {
+    "performance": {
+      "targetTTFB": "< 200ms",
+      "targetFCP": "< 1.8s",
+      "targetLCP": "< 2.5s",
+      "targetCLS": "< 0.1",
+      "optimizations": [
+        "CDN pentru imagini (CloudFlare, Bunny CDN)",
+        "Image lazy loading + WebP format",
+        "Critical CSS inline",
+        "Defer non-critical JavaScript",
+        "HTTP/2 Server Push pentru resurse critice",
+        "Database query caching (Redis)",
+        "Static generation pentru categorii populare"
+      ]
+    },
+    
+    "structuredData": {
+      "Product": {
+        "required": ["name", "image", "description", "brand", "offers"],
+        "offers": {
+          "priceCurrency": "RON",
+          "availability": "https://schema.org/InStock or OutOfStock",
+          "priceValidUntil": "+30 days",
+          "url": "Affiliate link"
+        },
+        "aggregateRating": "Optional - doar dacă există reviews",
+        "review": "Optional"
+      },
+      "BreadcrumbList": "Mandatory pe toate paginile produse",
+      "Organization": "Homepage",
+      "WebSite": "Homepage cu searchAction"
+    },
+    
+    "mobileFriendly": {
+      "responsive": true,
+      "viewport": "width=device-width, initial-scale=1",
+      "touchTargets": "Minimum 48x48px",
+      "fontSizes": "Minimum 16px pentru body text"
+    }
+  },
+  
+  "contentFreshness": {
+    "productUpdates": {
+      "priceCheck": "Zilnic prin feed sync",
+      "stockCheck": "Zilnic prin feed sync",
+      "lastmod": "Actualizare în sitemap la fiecare modificare"
+    },
+    "categoryPages": {
+      "dynamicElements": [
+        "\"Actualizat {current_date}\" în footer",
+        "Count produse live",
+        "Badge \"Noi\" pentru produse < 7 zile"
+      ]
+    }
+  }
+}

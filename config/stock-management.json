@@ -1,0 +1,243 @@
+{
+  "version": "1.0",
+  "description": "Politici de management pentru produse care dispar din feed-uri",
+  
+  "productLifecycleStates": {
+    "active": {
+      "description": "Produs prezent în feed, în stoc",
+      "actions": ["Display normal", "Include în sitemap", "Index: follow"],
+      "httpStatus": 200
+    },
+    
+    "out_of_stock": {
+      "description": "Produs prezent în feed dar fără stoc",
+      "displayStrategy": "Afișează pagina cu badge 'Stoc epuizat'",
+      "actions": [
+        "Păstrează URL-ul activ",
+        "Afișează alternative în stoc din aceeași categorie",
+        "Button 'Notifică-mă când revine în stoc'",
+        "Include în sitemap cu prioritate redusă"
+      ],
+      "metaRobots": "index, follow (dacă produs popular) SAU noindex, follow (după 7 zile)",
+      "httpStatus": 200,
+      "structuredData": "availability: OutOfStock"
+    },
+    
+    "out_of_stock_7d": {
+      "description": "Fără stoc de 7+ zile",
+      "actions": [
+        "Noindex, follow",
+        "Prioritate sitemap = 0.2",
+        "Alert dashboard pentru revizuire"
+      ],
+      "httpStatus": 200
+    },
+    
+    "out_of_stock_30d": {
+      "description": "Fără stoc de 30+ zile",
+      "displayStrategy": "Redirect 301 către categorie sau produs similar",
+      "actions": [
+        "IF produs popular (views > 100): Păstrează pagina cu oferte alternative",
+        "IF produs nepopular: Redirect 301 → categorie parent",
+        "Șterge din sitemap",
+        "Marchează în DB: status = 'long_term_unavailable'"
+      ],
+      "redirectLogic": {
+        "priority1": "Redirect către același brand + categorie (ex: alt MacBook)",
+        "priority2": "Redirect către aceeași categorie (ex: alți laptopuri)",
+        "priority3": "Redirect către categoria părinte",
+        "fallback": "Homepage (ultimă opțiune)"
+      },
+      "httpStatus": 301
+    },
+    
+    "discontinued": {
+      "description": "Produs dispărut complet din feed > 60 zile",
+      "actions": [
+        "IF backlinks > 5 SAU views > 500: Păstrează pagina cu mesaj 'Produs discontinued' + alternative",
+        "IF backlinks <= 5 AND views <= 500: Redirect 301",
+        "Marchează în DB: status = 'discontinued'",
+        "Șterge din sitemap"
+      ],
+      "displayForPopular": {
+        "title": "{{productName}} - Produs Discontinued",
+        "message": "Acest produs nu mai este disponibil. Iată alternativele noastre:",
+        "alternatives": "Afișează 6 produse similare",
+        "metaRobots": "noindex, follow",
+        "httpStatus": 200
+      },
+      "redirectForUnpopular": {
+        "httpStatus": 301,
+        "target": "Categorie sau produs similar"
+      }
+    },
+    
+    "price_changed_significantly": {
+      "description": "Preț crescut cu > 50% (posibil eroare în feed)",
+      "actions": [
+        "Marchează pentru review manual",
+        "Temporar ascunde din listări (is_active = false)",
+        "Alertă dashboard",
+        "Nu șterge din DB - așteaptă confirmare"
+      ],
+      "autoReactivation": "După 24h dacă prețul revine la normal"
+    }
+  },
+  
+  "redirectRules": {
+    "rule1_same_brand_category": {
+      "description": "Găsește cel mai similar produs: același brand + categorie + price range",
+      "sql": "SELECT id, slug FROM products WHERE brand = $brand AND category_id = $category AND price_cents BETWEEN $price * 0.8 AND $price * 1.2 AND is_active = true ORDER BY views_count DESC LIMIT 1",
+      "probability": "80%"
+    },
+    
+    "rule2_same_category": {
+      "description": "Dacă nu există același brand, redirect către cel mai popular din categorie",
+      "sql": "SELECT id, slug FROM products WHERE category_id = $category AND is_active = true ORDER BY views_count DESC LIMIT 1",
+      "probability": "15%"
+    },
+    
+    "rule3_parent_category": {
+      "description": "Redirect către pagina categoriei",
+      "target": "/categorie/subcategorie",
+      "probability": "5%"
+    }
+  },
+  
+  "automatedMonitoring": {
+    "dailyCron": {
+      "schedule": "03:00 AM daily",
+      "tasks": [
+        {
+          "name": "Detectează produse dispărute",
+          "query": "SELECT * FROM products WHERE feed_last_seen < NOW() - INTERVAL '1 day' AND status = 'active'",
+          "action": "Marchează status = 'out_of_stock'"
+        },
+        {
+          "name": "Produse fără stoc 7 zile",
+          "query": "SELECT * FROM products WHERE status = 'out_of_stock' AND feed_last_seen < NOW() - INTERVAL '7 days'",
+          "action": "Aplică noindex, prioritate sitemap = 0.2"
+        },
+        {
+          "name": "Produse fără stoc 30 zile",
+          "query": "SELECT * FROM products WHERE status = 'out_of_stock' AND feed_last_seen < NOW() - INTERVAL '30 days'",
+          "action": "Creează redirect 301, șterge din sitemap"
+        },
+        {
+          "name": "Produse discontinued 60 zile",
+          "query": "SELECT * FROM products WHERE status = 'out_of_stock' AND feed_last_seen < NOW() - INTERVAL '60 days'",
+          "action": "Finalizează discontinued flow"
+        }
+      ]
+    },
+    
+    "weeklyReview": {
+      "schedule": "Sunday 02:00 AM",
+      "tasks": [
+        "Audit manual pentru produse cu backlinks",
+        "Review redirects neaccesate (redirect_count = 0) în ultimele 30 zile",
+        "Identifică pattern-uri de produse discontinued (branduri, categorii)",
+        "Raport performanță redirects (404 vs 301)"
+      ]
+    }
+  },
+  
+  "urlStructure": {
+    "products": {
+      "pattern": "/{{category}}/{{subcategory}}/{{brand}}-{{slug}}-{{id}}",
+      "examples": [
+        "/electronice-it/laptopuri-calculatoare/apple-macbook-pro-14-m3-pro-12345",
+        "/moda-imbracaminte/femei/zara-rochie-summer-collection-67890",
+        "/electrocasnice/frigidere/samsung-side-by-side-617l-a-plus-plus-23456"
+      ],
+      "rules": [
+        "Slug lowercase cu diacritice românești",
+        "Separare cu '-' (hyphen)",
+        "Max 100 caractere pentru slug",
+        "Include ID la final pentru unicitate (permite refolosire slug-uri)"
+      ]
+    },
+    
+    "categories": {
+      "pattern": "/{{category-slug}}",
+      "examples": ["/electronice-it", "/moda-imbracaminte", "/casa-gradina"]
+    },
+    
+    "subcategories": {
+      "pattern": "/{{category-slug}}/{{subcategory-slug}}",
+      "examples": ["/electronice-it/laptopuri-calculatoare", "/moda-imbracaminte/femei"]
+    },
+    
+    "brands": {
+      "pattern": "/brand/{{brand-slug}}/{{category-slug}}",
+      "examples": ["/brand/apple/laptopuri", "/brand/samsung/telefoane"]
+    },
+    
+    "filters": {
+      "pattern": "/{{category}}/{{subcategory}}?brand={{brand}}&pret={{min}}-{{max}}",
+      "canonical": "Întotdeauna către /{{category}}/{{subcategory}} (fără parametri)",
+      "examples": [
+        "/electronice-it/laptopuri?brand=apple&pret=5000-10000 → canonical: /electronice-it/laptopuri"
+      ]
+    }
+  },
+  
+  "redirectStorage": {
+    "database": "url_redirects table",
+    "implementation": "Middleware Next.js pentru catch redirects înainte de routing",
+    "caching": "Redis cache pentru redirects frecvente (TTL: 7 days)",
+    "logging": "Log toate 404-urile pentru identificare oportunități de redirect"
+  },
+  
+  "404Handling": {
+    "strategy": "Custom 404 page cu recomandări",
+    "elements": [
+      "Mesaj prietenos: 'Pagina nu a fost găsită'",
+      "Search bar pentru căutare nouă",
+      "Produse populare din categorii principale",
+      "Link către homepage",
+      "Link către categorii principale"
+    ],
+    "seo": {
+      "httpStatus": 404,
+      "metaRobots": "noindex, nofollow",
+      "noSitemap": true
+    },
+    "monitoring": "Track 404s în Google Analytics + Sentry pentru debugging"
+  },
+  
+  "410Handling": {
+    "description": "Pentru produse permanent șterse (discontinued > 90 zile)",
+    "httpStatus": 410,
+    "message": "Acest produs a fost retras permanent din ofertă",
+    "alternatives": "Afișează produse similare",
+    "metaRobots": "noindex, nofollow",
+    "usage": "Doar pentru produse cu zero backlinks și zero traffic în ultimele 60 zile"
+  },
+  
+  "backlinksProtection": {
+    "monitoring": "Integrare cu Ahrefs API sau Google Search Console",
+    "rule": "Produse cu > 5 backlinks nu se șterge niciodată - doar discontinued page cu alternative",
+    "implementation": "Check backlinks înainte de aplicare redirect 301 sau 410"
+  },
+  
+  "metricsTracking": {
+    "redirectMetrics": {
+      "redirectCount": "Număr de redirects efectuate",
+      "avgLoadTime": "Timp mediu de procesare redirect",
+      "targetPageBounceRate": "Bounce rate pe pagina de destinație"
+    },
+    
+    "discontinuedProductsMetrics": {
+      "totalDiscontinued": "Total produse discontinued",
+      "redirected": "Produse cu redirect 301",
+      "kept": "Produse păstrate cu pagină discontinued",
+      "deleted": "Produse șterse complet (410)"
+    },
+    
+    "impactMetrics": {
+      "organicTrafficLoss": "Pierdere trafic organic din produse discontinued",
+      "recoveredTraffic": "Trafic recuperat prin redirects eficiente"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1A2B48;
+  --amdoro-blue: #1A2B48;
+  --amdoro-teal: #1DB995;
+  --amdoro-amber: #E8B042;
+  --amdoro-bg: #FFFFFF;
+  --amdoro-gray: #F4F7F6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Poppins', var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Culori personalizate Amdoro */
+  --color-amdoro-blue: #1A2B48;
+  --color-amdoro-blue-hover: #152236;
+  --color-amdoro-teal: #1DB995;
+  --color-amdoro-teal-hover: #18a082;
+  --color-amdoro-amber: #E8B042;
+  --color-amdoro-amber-hover: #d69e35;
+  --color-amdoro-bg: #FFFFFF;
+  --color-amdoro-gray: #F4F7F6;
+  --color-amdoro-gray-light: #FAFBFB;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

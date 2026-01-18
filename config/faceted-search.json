@@ -1,0 +1,284 @@
+{
+  "version": "1.0",
+  "description": "Configurație Faceted Search pentru Amdoro.ro - Previne conținut duplicat",
+  
+  "seoRules": {
+    "canonicalStrategy": "Doar URL-ul de bază al categoriei are canonical către sine. Toate filtrările au canonical către URL-ul de bază.",
+    "indexationPolicy": {
+      "noindex": [
+        "Filtrări pe preț",
+        "Filtrări pe mai mult de 2 atribute simultan",
+        "Sortări (excepție: sortare după preț)",
+        "Paginare > pagina 2"
+      ],
+      "index": [
+        "Categorii principale",
+        "Subcategorii",
+        "Filtrări pe 1 brand popular (top 20 branduri)",
+        "Pagina 1 a oricărei căutări",
+        "Landing pages create manual"
+      ]
+    },
+    "urlStructure": {
+      "preferred": "amdoro.ro/categorie/subcategorie",
+      "filters": "amdoro.ro/categorie/subcategorie?brand=apple&pret=1000-2000",
+      "canonicalAlways": "amdoro.ro/categorie/subcategorie"
+    }
+  },
+  
+  "filterableAttributes": {
+    "brand": {
+      "type": "multiselect",
+      "displayName": "Brand",
+      "indexable": true,
+      "indexConditions": {
+        "minProductsCount": 10,
+        "topBrandsOnly": 20,
+        "createLandingPage": true
+      },
+      "urlParameter": "brand",
+      "seoPattern": "Produse {brand} - {categoryName} | Amdoro.ro",
+      "priority": 1
+    },
+    
+    "price": {
+      "type": "range",
+      "displayName": "Preț (RON)",
+      "indexable": false,
+      "ranges": [
+        {"min": 0, "max": 100, "label": "Sub 100 RON"},
+        {"min": 100, "max": 300, "label": "100 - 300 RON"},
+        {"min": 300, "max": 500, "label": "300 - 500 RON"},
+        {"min": 500, "max": 1000, "label": "500 - 1000 RON"},
+        {"min": 1000, "max": 2000, "label": "1000 - 2000 RON"},
+        {"min": 2000, "max": null, "label": "Peste 2000 RON"}
+      ],
+      "urlParameter": "pret",
+      "priority": 2
+    },
+    
+    "discount": {
+      "type": "boolean",
+      "displayName": "Reduceri",
+      "indexable": true,
+      "indexConditions": {
+        "createSpecialPage": true,
+        "pageName": "Oferte {categoryName}"
+      },
+      "urlParameter": "reducere",
+      "values": [
+        {"value": "10", "label": "Peste 10% reducere"},
+        {"value": "25", "label": "Peste 25% reducere"},
+        {"value": "50", "label": "Peste 50% reducere"}
+      ],
+      "priority": 3
+    },
+    
+    "inStock": {
+      "type": "boolean",
+      "displayName": "Disponibilitate",
+      "indexable": false,
+      "urlParameter": "stoc",
+      "values": [
+        {"value": "true", "label": "În stoc"},
+        {"value": "preorder", "label": "Precomandă"}
+      ],
+      "priority": 4
+    },
+    
+    "categorySpecific": {
+      "laptopuri-calculatoare": {
+        "ram": {
+          "type": "multiselect",
+          "displayName": "Memorie RAM",
+          "indexable": false,
+          "values": ["4GB", "8GB", "16GB", "32GB", "64GB"],
+          "urlParameter": "ram"
+        },
+        "procesor": {
+          "type": "multiselect",
+          "displayName": "Procesor",
+          "indexable": false,
+          "values": ["Intel Core i3", "Intel Core i5", "Intel Core i7", "Intel Core i9", "AMD Ryzen 5", "AMD Ryzen 7", "AMD Ryzen 9"],
+          "urlParameter": "procesor"
+        },
+        "stocare": {
+          "type": "multiselect",
+          "displayName": "Stocare",
+          "indexable": false,
+          "values": ["256GB SSD", "512GB SSD", "1TB SSD", "2TB SSD"],
+          "urlParameter": "stocare"
+        },
+        "diagonala": {
+          "type": "range",
+          "displayName": "Diagonală ecran",
+          "indexable": false,
+          "values": ["13 inch", "14 inch", "15.6 inch", "17 inch"],
+          "urlParameter": "diagonala"
+        }
+      },
+      
+      "telefoane-tablete": {
+        "ram": {
+          "type": "multiselect",
+          "displayName": "Memorie RAM",
+          "values": ["4GB", "6GB", "8GB", "12GB", "16GB"]
+        },
+        "stocare": {
+          "type": "multiselect",
+          "displayName": "Stocare internă",
+          "values": ["64GB", "128GB", "256GB", "512GB", "1TB"]
+        },
+        "sistem-operare": {
+          "type": "multiselect",
+          "displayName": "Sistem de operare",
+          "values": ["Android", "iOS", "HarmonyOS"]
+        },
+        "diagonala": {
+          "type": "range",
+          "displayName": "Diagonală",
+          "values": ["Sub 6 inch", "6-6.5 inch", "6.5-7 inch", "Peste 7 inch"]
+        }
+      },
+      
+      "moda-imbracaminte": {
+        "marime": {
+          "type": "multiselect",
+          "displayName": "Mărime",
+          "indexable": false,
+          "values": ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
+        },
+        "culoare": {
+          "type": "multiselect",
+          "displayName": "Culoare",
+          "indexable": false,
+          "values": ["Negru", "Alb", "Albastru", "Roșu", "Verde", "Galben", "Gri"]
+        },
+        "material": {
+          "type": "multiselect",
+          "displayName": "Material",
+          "values": ["Bumbac", "Poliester", "Lână", "Piele", "Denim"]
+        }
+      },
+      
+      "electrocasnice": {
+        "capacitate": {
+          "type": "range",
+          "displayName": "Capacitate",
+          "values": ["Sub 200L", "200-400L", "400-600L", "Peste 600L"]
+        },
+        "clasa-energetica": {
+          "type": "multiselect",
+          "displayName": "Clasă energetică",
+          "indexable": true,
+          "values": ["A+++", "A++", "A+", "A", "B"]
+        },
+        "tip": {
+          "type": "multiselect",
+          "displayName": "Tip",
+          "values": ["Încorporabil", "Standalone", "Mini"]
+        }
+      }
+    }
+  },
+  
+  "sortingOptions": {
+    "relevant": {
+      "label": "Cele mai relevante",
+      "indexable": true,
+      "default": true,
+      "algorithm": "weighted_score",
+      "weights": {
+        "textRelevance": 0.4,
+        "popularity": 0.3,
+        "recency": 0.2,
+        "commission": 0.1
+      }
+    },
+    "price-asc": {
+      "label": "Preț crescător",
+      "indexable": true,
+      "field": "price_cents",
+      "direction": "ASC"
+    },
+    "price-desc": {
+      "label": "Preț descrescător",
+      "indexable": true,
+      "field": "price_cents",
+      "direction": "DESC"
+    },
+    "newest": {
+      "label": "Cele mai noi",
+      "indexable": false,
+      "field": "created_at",
+      "direction": "DESC"
+    },
+    "popular": {
+      "label": "Cele mai populare",
+      "indexable": false,
+      "field": "views_count",
+      "direction": "DESC"
+    },
+    "discount": {
+      "label": "Reduceri mari",
+      "indexable": false,
+      "field": "discount_percent",
+      "direction": "DESC"
+    }
+  },
+  
+  "antiDuplicateRules": {
+    "rule1": "Dacă există >1 filtru activ (ex: brand + preț), aplică noindex, nofollow",
+    "rule2": "Dacă există sortare (excepție: default), aplică noindex, follow",
+    "rule3": "Dacă pagina > 2, aplică noindex, follow și rel='prev/next'",
+    "rule4": "Canonical întotdeauna către URL-ul de bază al categoriei (fără parametri)",
+    "rule5": "Pentru branduri TOP 20, creează landing page separată: /brand/apple/laptopuri (index, follow)",
+    "rule6": "Pentru oferte speciale, creează URL static: /oferte/electronice (index, follow)"
+  },
+  
+  "robotsMetaGeneration": {
+    "algorithm": "Evaluează număr filtré + paginare + sortare",
+    "conditions": [
+      {
+        "if": "filters.length === 0 && page === 1",
+        "then": "index, follow"
+      },
+      {
+        "if": "filters.length === 1 && filters[0] === 'brand' && brand in topBrands && page === 1",
+        "then": "index, follow"
+      },
+      {
+        "if": "filters.includes('discount') && page === 1",
+        "then": "index, follow"
+      },
+      {
+        "if": "page > 1 && page <= 3",
+        "then": "noindex, follow"
+      },
+      {
+        "if": "page > 3",
+        "then": "noindex, nofollow"
+      },
+      {
+        "default": "noindex, follow"
+      }
+    ]
+  },
+  
+  "performanceOptimizations": {
+    "caching": {
+      "filterCounts": "Cache rezultate count(*) pentru fiecare combinație de filtré - TTL 5 minute",
+      "popularFilters": "Pre-calculează combinațiile populare de filtré în Redis",
+      "categoryProducts": "Cache lista de produse pentru categorii mari - TTL 10 minute"
+    },
+    "indexStrategy": {
+      "compositeIndexes": "Creează indexuri compuse pentru combinații frecvente: (category_id, brand, price_cents)",
+      "partialIndexes": "Folosește partial indexes pentru is_active = true"
+    },
+    "queryOptimization": {
+      "pagination": "Folosește keyset pagination în loc de OFFSET pentru paginare mare",
+      "countOptimization": "Pentru count(*), folosește estimări din pg_stat pentru paginare",
+      "materializare": "Materializează view-uri pentru categorii mari (>10.000 produse)"
+    }
+  }
+}
