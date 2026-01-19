@@ -1,28 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { loadProducts } from '@/lib/products';
 
-// Force Node.js runtime (nu edge runtime)
-export const runtime = 'nodejs';
-
-// Cache pentru produse (același mecanism ca în /api/products)
-let cachedProducts: any[] | null = null;
-let lastModified: number = 0;
-
-function getProducts() {
-  const filePath = path.join(process.cwd(), 'data', 'products.json');
-  const stats = fs.statSync(filePath);
-  
-  if (cachedProducts && stats.mtimeMs === lastModified) {
-    return cachedProducts;
-  }
-  
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  cachedProducts = JSON.parse(fileContent);
-  lastModified = stats.mtimeMs;
-  
-  return cachedProducts;
-}
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
@@ -43,11 +23,11 @@ export async function GET(
       );
     }
 
-    // Find the product by ID using cache
-    const products = getProducts();
+    // Load products using the same cache mechanism as /api/products
+    const products = await loadProducts();
     
     // Check if products loaded successfully
-    if (!products) {
+    if (!products || products.length === 0) {
       return NextResponse.json(
         { error: 'Product database not available' },
         { status: 503 }

@@ -7,13 +7,13 @@
 export const SUBCATEGORY_RULES = {
   Electronics: [
     { name: 'Laptops', keywords: ['laptop', 'notebook', 'ultrabook'] },
-    { name: 'Telefoane', keywords: ['telefon', 'smartphone', 'iphone', 'samsung galaxy', 'xiaomi'] },
+    { name: 'Telefoane', keywords: ['telefon mobil', 'smartphone', 'iphone', 'samsung galaxy', 'xiaomi redmi', 'xiaomi mi', 'oppo', 'realme', 'oneplus'] },
     { name: 'TV & Audio', keywords: ['televizor', 'tv', 'smart tv', 'boxe', 'soundbar', 'home cinema'] },
     { name: 'Calculatoare', keywords: ['calculator', 'desktop', 'pc gaming', 'all-in-one'] },
     { name: 'Tablete', keywords: ['tableta', 'tablet', 'ipad'] },
     { name: 'Smartwatch', keywords: ['smartwatch', 'ceas inteligent', 'apple watch', 'galaxy watch'] },
     { name: 'Componente PC', keywords: ['placa video', 'procesor', 'ram', 'ssd', 'hdd', 'carcasa', 'sursa'] },
-    { name: 'Periferice', keywords: ['mouse', 'tastatura', 'headset', 'casti', 'webcam', 'monitor'] },
+    { name: 'Periferice', keywords: ['mouse', 'tastatura', 'headset', 'casti gaming', 'webcam', 'monitor'] },
     { name: 'Camere', keywords: ['camera foto', 'aparat foto', 'dslr', 'mirrorless', 'obiectiv'] },
     { name: 'Gaming', keywords: ['consola', 'playstation', 'xbox', 'nintendo', 'controller'] },
     { name: 'Imprimante', keywords: ['imprimanta', 'scanner', 'multifunctionala'] },
