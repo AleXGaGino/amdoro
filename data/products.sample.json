@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "title": "Sample Product - Deploy in progress",
+    "price": 99.99,
+    "category": "Electronics",
+    "imageURL": "https://placehold.co/400x400/EEE/31343C?font=montserrat&text=Deploy+In+Progress",
+    "affiliateLink": "https://example.com"
+  }
+]

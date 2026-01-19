@@ -45,6 +45,15 @@ export async function GET(
 
     // Find the product by ID using cache
     const products = getProducts();
+    
+    // Check if products loaded successfully
+    if (!products) {
+      return NextResponse.json(
+        { error: 'Product database not available' },
+        { status: 503 }
+      );
+    }
+    
     const product = products.find((p) => p.id === productId);
 
     // If product not found, return 404
