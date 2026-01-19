@@ -37,6 +37,19 @@ export async function loadProducts(): Promise<any[]> {
 }
 
 /**
+ * Decode HTML entities in URLs (e.g., &amp; to &)
+ */
+function decodeHtmlEntities(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+/**
  * Convertește produs din JSON la structura Product
  */
 export function convertJsonToProduct(jsonProduct: any): Product {
@@ -52,6 +65,20 @@ export function convertJsonToProduct(jsonProduct: any): Product {
   
   // Map category
   const categoryInfo = mapCategory(jsonProduct.category, 'json');
+  
+  // Handle image URL - decode HTML entities
+  const rawImageUrl = jsonProduct.imageURL || jsonProduct.image_url || '';
+  const decodedImageUrl = decodeHtmlEntities(rawImageUrl);
+  
+  // Debug for Electronics products
+  if (jsonProduct.id >= 126238 && jsonProduct.id <= 126242) {
+    console.log(`[Backend] Product ${jsonProduct.id}:`, {
+      rawImageUrl,
+      decodedImageUrl,
+      hasAmp: rawImageUrl.includes('&amp;'),
+      hasAmpAfter: decodedImageUrl.includes('&amp;')
+    });
+  }
   
   return {
     id: jsonProduct.id,
@@ -78,7 +105,7 @@ export function convertJsonToProduct(jsonProduct: any): Product {
     meta_description: generateMetaDescription(jsonProduct.title, brand, price, jsonProduct.description),
     h1_title: `${brand ? brand + ' ' : ''}${jsonProduct.title}`,
     
-    image_url: jsonProduct.imageURL || jsonProduct.image_url || '',
+    image_url: decodedImageUrl,
     images_additional: [],
     
     affiliate_link: jsonProduct.affiliateLink || jsonProduct.affiliate_link || '#',

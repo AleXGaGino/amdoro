@@ -33,7 +33,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
+# Large data files (307k+ products, 155MB)
+/data/products.json
+/feed.csv
+
+# Vercel
 .vercel
 
 # typescript

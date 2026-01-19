@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ProductBadge from './ProductBadge';
 import { ProductDisplay } from '@/types';
 
@@ -41,6 +41,9 @@ export default function ProductCard({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [shouldLoadImage, setShouldLoadImage] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   
   // Use new architecture fields or fallback to legacy
   const productImage = imageUrl || imageURL || '';
@@ -57,20 +60,71 @@ export default function ProductCard({
   // Fallback image placeholder - trebuie definit ÎNAINTE de a fi folosit
   const fallbackImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%23F4F7F6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="%231A2B48"%3EImagine indisponibilă%3C/text%3E%3C/svg%3E';
   
-  // Proxy pentru imagini care pot avea probleme de CORS sau URL-uri invalide
-  const getProxiedImage = (url: string) => {
+  // Use images directly (most CDNs have CORS enabled)
+  const getImageUrl = (url: string) => {
     try {
       if (!url || url === '') return fallbackImage;
       if (url.startsWith('data:')) return url;
       
-      const encodedUrl = encodeURIComponent(url);
-      return `https://wsrv.nl/?url=${encodedUrl}&w=400&h=400&fit=contain&bg=white`;
+      // Return direct URL - most modern CDNs support CORS
+      return url;
     } catch {
       return fallbackImage;
     }
   };
   
-  const imageSource = imgError ? fallbackImage : getProxiedImage(productImage);
+  const imageSource = imgError ? fallbackImage : getImageUrl(productImage);
+  
+  // Check if image needs unoptimized mode (evomag has complex query params)
+  const needsUnoptimized = imageSource.includes('evomag.ro') || imageSource.includes('sign=') || imageSource.startsWith('data:');
+  
+  // Intersection Observer pentru lazy loading real - imaginile se încarcă doar când sunt vizibile
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInViewport(true);
+            observer.disconnect(); // Stop observing după ce devine vizibil
+          }
+        });
+      },
+      {
+        rootMargin: '50px', // Începe încărcarea cu 50px înainte să intre în viewport
+        threshold: 0.1,
+      }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+  
+  // Lazy load images cu delay pentru evomag DOAR când cardul e vizibil
+  useEffect(() => {
+    if (!isInViewport) return; // Nu încărca până nu e vizibil
+    
+    if (imageSource.includes('evomag.ro')) {
+      // Random delay între 2-3 secunde pentru evomag când devine vizibil
+      const delay = Math.random() * 1000 + 2000;
+      const timer = setTimeout(() => {
+        setShouldLoadImage(true);
+      }, delay);
+      return () => clearTimeout(timer);
+    } else {
+      // Încarcă imediat pentru alte CDN-uri când devine vizibil
+      setShouldLoadImage(true);
+    }
+  }, [isInViewport, imageSource]);
+  
+  // Debug logging - always log to see what's happening
+  if (productImage.includes('evomag.ro') && id <= 126242) {
+    console.log(`Product ${id}: evomag image with delay`);
+  }
   
   // Track recently viewed on mount
   useEffect(() => {
@@ -121,23 +175,36 @@ export default function ProductCard({
   };
 
   return (
-    <div className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-xl hover:border-[#1A2B48]/30 transition-all duration-300">
+    <div 
+      ref={cardRef}
+      className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-xl hover:border-[#1A2B48]/30 transition-all duration-300"
+    >
       <div className="relative h-64 overflow-hidden bg-gray-50">
         {!imgLoaded && !imgError && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="animate-pulse bg-gray-200 w-full h-full"></div>
           </div>
         )}
-        <img
-          src={imageSource}
-          alt={title}
-          onError={() => setImgError(true)}
-          onLoad={() => setImgLoaded(true)}
-          loading="lazy"
-          className={`w-full h-full object-contain p-4 group-hover:scale-105 transition-all duration-500 ${
-            imgLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
+        {shouldLoadImage ? (
+          <img
+            src={imageSource}
+            alt={title}
+            onError={(e) => {
+              setImgError(true);
+            }}
+            onLoad={() => {
+              setImgLoaded(true);
+            }}
+            loading="lazy"
+            className={`w-full h-full object-contain p-4 group-hover:scale-105 transition-all duration-500 ${
+              imgLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+          </div>
+        )}
         
         {/* Wishlist Button */}
         <button

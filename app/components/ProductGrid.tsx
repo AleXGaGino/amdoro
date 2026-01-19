@@ -13,7 +13,7 @@ interface ProductGridProps {
   setActiveSubcategory?: (subcategory: string | null) => void;
 }
 
-const PRODUCTS_PER_PAGE = 36;
+const PRODUCTS_PER_PAGE = 12;
 
 export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'relevant', activeSubcategory = null, setActiveSubcategory }: ProductGridProps) {
   const [displayedProducts, setDisplayedProducts] = useState<ProductDisplay[]>([]);
@@ -150,23 +150,25 @@ export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'rel
         ) : displayedProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {displayedProducts.map((product, index) => (
-                <div 
-                  key={product.id}
-                  style={{
-                    animation: `fadeIn 0.5s ease-in-out ${index * 0.05}s both`
-                  }}
-                >
-                  <ProductCard
-                    id={product.id}
-                    title={product.title}
-                    price={product.price}
-                    imageURL={product.imageURL}
-                    category={product.category}
-                    affiliateLink={product.affiliateLink}
-                  />
-                </div>
-              ))}
+              {displayedProducts.map((product, index) => {
+                return (
+                  <div 
+                    key={product.id}
+                    style={{
+                      animation: `fadeIn 0.5s ease-in-out ${index * 0.05}s both`
+                    }}
+                  >
+                    <ProductCard
+                      id={product.id}
+                      title={product.title}
+                      price={product.price}
+                      imageUrl={product.imageUrl}
+                      category={product.categoryName}
+                      affiliateLink={product.affiliateLink}
+                    />
+                  </div>
+                );
+              })}
             </div>
             
             <style jsx>{`
