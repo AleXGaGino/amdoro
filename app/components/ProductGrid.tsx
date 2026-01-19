@@ -24,6 +24,9 @@ export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'rel
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
 
   useEffect(() => {
+    // Create AbortController to cancel previous requests
+    const abortController = new AbortController();
+    
     setIsLoading(true);
     setCurrentPage(1);
     setDisplayedProducts([]);
@@ -44,7 +47,12 @@ export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'rel
       params.append('subcategory', activeSubcategory);
     }
     
-    fetch(`/api/products?${params.toString()}`)
+    // Add cache busting timestamp for category changes
+    params.append('_t', Date.now().toString());
+    
+    fetch(`/api/products?${params.toString()}`, {
+      signal: abortController.signal
+    })
       .then(res => {
         if (!res.ok) {
           throw new Error(`API error: ${res.status}`);
@@ -52,18 +60,28 @@ export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'rel
         return res.json();
       })
       .then(data => {
+        // Only update if request wasn't cancelled
         setDisplayedProducts(data.products || []);
         setTotalProducts(data.total || 0);
         setHasMore(data.hasMore || false);
         setIsLoading(false);
       })
       .catch(error => {
+        // Ignore abort errors (expected when switching categories)
+        if (error.name === 'AbortError') {
+          return;
+        }
         console.error('Error fetching products:', error);
         setDisplayedProducts([]);
         setTotalProducts(0);
         setHasMore(false);
         setIsLoading(false);
       });
+    
+    // Cleanup: abort fetch when category changes
+    return () => {
+      abortController.abort();
+    };
   }, [activeCategory, searchQuery, sortBy, priceRange, activeSubcategory]);
 
   const loadMore = async () => {

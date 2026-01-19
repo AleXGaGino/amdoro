@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       }
     }, {
       headers: {
-        'Cache-Control': 'public, max-age=10, stale-while-revalidate=30',
+        'Cache-Control': 'public, max-age=5, must-revalidate',
         'X-Response-Time': `${responseTime}ms`,
       }
     });

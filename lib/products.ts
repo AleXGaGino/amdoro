@@ -5,10 +5,10 @@ import { Product, ProductDisplay, Category, toProductDisplay } from '@/types';
 import categoryMappingConfig from '@/config/category-mapping.json';
 import { SUBCATEGORY_RULES } from './categories';
 
-// Cache pentru products.json (1 minute TTL to balance performance vs freshness)
+// Cache pentru products.json (5 seconds TTL for fresh category switches)
 let productsCache: any[] | null = null;
 let cacheTimestamp: number = 0;
-const CACHE_TTL = 60 * 1000; // 1 minute - prevents 502 timeout while keeping data fresh
+const CACHE_TTL = 5 * 1000; // 5 seconds - prevents 502 timeout, keeps data fresh on category change
 
 /**
  * Încarcă produsele din products.json cu caching
