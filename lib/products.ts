@@ -5,10 +5,10 @@ import { Product, ProductDisplay, Category, toProductDisplay } from '@/types';
 import categoryMappingConfig from '@/config/category-mapping.json';
 import { SUBCATEGORY_RULES } from './categories';
 
-// Cache pentru products.json (disabled for Netlify to prevent stale data)
+// Cache pentru products.json (1 minute TTL to balance performance vs freshness)
 let productsCache: any[] | null = null;
 let cacheTimestamp: number = 0;
-const CACHE_TTL = 0; // Disabled - reload every time to prevent stale data
+const CACHE_TTL = 60 * 1000; // 1 minute - prevents 502 timeout while keeping data fresh
 
 /**
  * Încarcă produsele din products.json cu caching
@@ -16,8 +16,8 @@ const CACHE_TTL = 0; // Disabled - reload every time to prevent stale data
 export async function loadProducts(): Promise<any[]> {
   const now = Date.now();
   
-  // Always reload on Netlify/production to prevent cached stale data
-  if (productsCache && (now - cacheTimestamp) < CACHE_TTL && CACHE_TTL > 0) {
+  // Use cache if valid (prevents reading 155MB on every request)
+  if (productsCache && (now - cacheTimestamp) < CACHE_TTL) {
     return productsCache;
   }
   

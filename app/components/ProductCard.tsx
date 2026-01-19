@@ -121,11 +121,6 @@ export default function ProductCard({
     }
   }, [isInViewport, imageSource]);
   
-  // Debug logging - always log to see what's happening
-  if (productImage.includes('evomag.ro') && id <= 126242) {
-    console.log(`Product ${id}: evomag image with delay`);
-  }
-  
   // Track recently viewed on mount
   useEffect(() => {
     const recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');

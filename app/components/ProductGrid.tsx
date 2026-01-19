@@ -45,15 +45,23 @@ export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'rel
     }
     
     fetch(`/api/products?${params.toString()}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setDisplayedProducts(data.products);
-        setTotalProducts(data.total);
-        setHasMore(data.hasMore);
+        setDisplayedProducts(data.products || []);
+        setTotalProducts(data.total || 0);
+        setHasMore(data.hasMore || false);
         setIsLoading(false);
       })
-      .catch(err => {
-        console.error('Error fetching products:', err);
+      .catch(error => {
+        console.error('Error fetching products:', error);
+        setDisplayedProducts([]);
+        setTotalProducts(0);
+        setHasMore(false);
         setIsLoading(false);
       });
   }, [activeCategory, searchQuery, sortBy, priceRange, activeSubcategory]);
@@ -111,9 +119,9 @@ export default function ProductGrid({ activeCategory, searchQuery, sortBy = 'rel
               </p>
             )}
             <p className="text-gray-600">
-              <span className="font-bold text-[#1A2B48]">{totalProducts.toLocaleString('ro-RO')}</span> {totalProducts === 1 ? 'produs' : 'produse'} găsite
+              <span className="font-bold text-[#1A2B48]">{(totalProducts || 0).toLocaleString('ro-RO')}</span> {totalProducts === 1 ? 'produs' : 'produse'} găsite
               {displayedProducts.length < totalProducts && (
-                <span className="text-blue-400"> · Afișate {displayedProducts.length.toLocaleString('ro-RO')}</span>
+                <span className="text-blue-400"> · Afișate {(displayedProducts.length || 0).toLocaleString('ro-RO')}</span>
               )}
             </p>
           </div>

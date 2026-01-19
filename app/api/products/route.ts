@@ -57,9 +57,7 @@ export async function GET(request: NextRequest) {
       }
     }, {
       headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        'Cache-Control': 'public, max-age=10, stale-while-revalidate=30',
         'X-Response-Time': `${responseTime}ms`,
       }
     });
