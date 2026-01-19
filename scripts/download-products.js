@@ -11,9 +11,11 @@ const path = require('path');
 
 // Try multiple sources
 const DOWNLOAD_SOURCES = [
+  // Direct release asset URL (works for public repos)
   'https://github.com/AleXGaGino/amdoro/releases/download/v1.0-data/products.json',
-  'https://github.com/AleXGaGino/amdoro/releases/download/data-v1/products.json',
-  'https://raw.githubusercontent.com/AleXGaGino/amdoro/data/data/products.json' // fallback branch
+  // GitHub API URL (works for private repos with token, or public without)
+  'https://api.github.com/repos/AleXGaGino/amdoro/releases/tags/v1.0-data',
+  // Fallback to sample
 ];
 
 const OUTPUT_PATH = path.join(__dirname, '../data/products.json');
@@ -61,6 +63,46 @@ function tryDownload(urlIndex = 0) {
 
   const url = DOWNLOAD_SOURCES[urlIndex];
   console.log(`Trying source ${urlIndex + 1}/${DOWNLOAD_SOURCES.length}: ${url}`);
+
+  // Special handling for GitHub API
+  if (url.includes('api.github.com')) {
+    https.get(url, {
+      headers: {
+        'User-Agent': 'Amdoro-Deploy-Script',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }, (response) => {
+      let data = '';
+      response.on('data', chunk => data += chunk);
+      response.on('end', () => {
+        try {
+          const release = JSON.parse(data);
+          const asset = release.assets?.find(a => a.name === 'products.json');
+          if (asset && asset.browser_download_url) {
+            console.log(`  ✓ Found asset, downloading from: ${asset.browser_download_url}`);
+            downloadFromUrl(asset.browser_download_url, urlIndex);
+          } else {
+            console.log(`  ⚠️ Asset not found in release, trying next source...`);
+            tryDownload(urlIndex + 1);
+          }
+        } catch (e) {
+          console.log(`  ⚠️ Failed to parse API response, trying next source...`);
+          tryDownload(urlIndex + 1);
+        }
+      });
+    }).on('error', () => {
+      console.log(`  ⚠️ API request failed, trying next source...`);
+      tryDownload(urlIndex + 1);
+    });
+    return;
+  }
+
+  // Regular download
+  downloadFromUrl(url, urlIndex);
+}
+
+function downloadFromUrl(url, urlIndex) {
+  const file = fs.createWriteStream(OUTPUT_PATH);
 
   https.get(url, (response) => {
     if (response.statusCode === 404) {
